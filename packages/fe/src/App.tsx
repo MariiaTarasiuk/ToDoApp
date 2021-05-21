@@ -18,6 +18,11 @@ mutation CreateTodo($text: String!){
   createTodo(text: $text)
 }`
 
+const UPDATE_TODO = gql`
+mutation UpdateTodo($id: String!){
+  updateTodo(id: $id)
+}`
+
 const DELETE_TODO = gql`
   mutation RemoveTodo($id: String!){ 
     removeTodo(id: $id)
@@ -27,8 +32,9 @@ const DELETE_TODO = gql`
 const App = () => {
 
   const { data, loading, error } = useQuery(READ_TODOS);
-  const [delTodo] = useMutation(DELETE_TODO);
   const [addTodo] = useMutation(CREATE_TODO);
+  const [updateTodo] = useMutation(UPDATE_TODO);
+  const [delTodo] = useMutation(DELETE_TODO);
   let todoInput: HTMLInputElement;
 
   if (loading) return <p>loading...</p>;
@@ -42,7 +48,13 @@ const App = () => {
   }
 
   const removeHandler = (id: string) => {
-    delTodo({ variables: { id } }); window.location.reload();
+    delTodo({ variables: { id } });
+    window.location.reload();
+  }
+
+  const updateHandler = (id: string) => {
+    updateTodo({ variables: { id } });
+    window.location.reload();
   }
 
   return (
@@ -54,7 +66,7 @@ const App = () => {
       <ul>
         {data.todos.map((todo: any) =>
           <li key={todo.id}>
-            <input type="checkbox" name="status" id={todo.id} checked={todo.completed} />
+            <input type="checkbox" name="status" id={todo.id} checked={todo.completed} onClick={() => { updateHandler(todo.id) }} />
             <span className={todo.completed ? "complete" : "open"}>{todo.text}</span>
             <button onClick={() => removeHandler(todo.id)}>X</button>
           </li>
