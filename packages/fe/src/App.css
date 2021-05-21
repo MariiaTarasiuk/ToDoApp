@@ -18,3 +18,10 @@
   color: white;
 }
 
+.complete {
+  color: blue;
+}
+
+.open {
+  color: green;
+}
