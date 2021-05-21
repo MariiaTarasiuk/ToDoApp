@@ -1,0 +1,11 @@
+{
+  "name": "todo-app-react-graphql-monorepo",
+  "version": "1.0.0",
+  "private": "true",
+  "repository": "https://github.com/MariiaTarasiuk/ToDoApp.git",
+  "author": "Mariia Tarasiuk <maria.tarasiuck@gmail.com>",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*"
+  ]
+}
