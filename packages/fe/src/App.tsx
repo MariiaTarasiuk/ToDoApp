@@ -66,7 +66,7 @@ const App = () => {
       <ul>
         {data.todos.map((todo: any) =>
           <li key={todo.id}>
-            <input type="checkbox" name="status" id={todo.id} checked={todo.completed} onClick={() => { updateHandler(todo.id) }} />
+            <input type="checkbox" name="status" id={todo.id} checked={todo.completed} onChange={() => { updateHandler(todo.id) }} />
             <span className={todo.completed ? "complete" : "open"}>{todo.text}</span>
             <button onClick={() => removeHandler(todo.id)}>X</button>
           </li>
