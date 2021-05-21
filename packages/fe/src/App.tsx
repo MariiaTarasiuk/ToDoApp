@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
-import { useQuery } from '@apollo/react-hooks';
-import gql from "graphql-tag";
+import { useQuery, useMutation } from '@apollo/react-hooks';
+import { gql } from '@apollo/client';
 
 const READ_TODOS = gql`
   query todos{
@@ -13,9 +13,16 @@ const READ_TODOS = gql`
   }
 `;
 
+const DELETE_TODO = gql`
+  mutation RemoveTodo($id: String!){ 
+    removeTodo(id: $id)
+  }
+`;
+
 const App = () => {
 
   const { data, loading, error } = useQuery(READ_TODOS);
+  const [delTodo] = useMutation(DELETE_TODO);
 
   if (loading) return <p>loading...</p>;
   if (error) return <p>ERROR</p>;
@@ -27,10 +34,11 @@ const App = () => {
         {data.todos.map((todo: any) =>
           <li key={todo.id}>
             <span className={todo.completed ? "complete" : "open"}>{todo.text}</span>
+            <button onClick={() => { delTodo({ variables: { id: todo.id } }); window.location.reload(); }}>X</button>
           </li>
         )}
       </ul>
-    </div>
+    </div >
   );
 }
 
