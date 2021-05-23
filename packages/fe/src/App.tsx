@@ -31,30 +31,27 @@ const DELETE_TODO = gql`
 
 const App = () => {
 
-  const { data, loading, error } = useQuery(READ_TODOS);
+  const { data, loading, error, refetch } = useQuery(READ_TODOS);
   const [addTodo] = useMutation(CREATE_TODO);
   const [updateTodo] = useMutation(UPDATE_TODO);
   const [delTodo] = useMutation(DELETE_TODO);
   let todoInput: HTMLInputElement;
 
-  if (loading) return <p>loading...</p>;
-  if (error) return <p>ERROR</p>;
-  if (!data) return <p>Not found</p>;
 
   const addHandler = (event: HTMLFormElement) => {
     event.preventDefault();
     addTodo({ variables: { text: todoInput.value } });
-    window.location.reload();
+    refetch();
   }
 
   const removeHandler = (id: string) => {
     delTodo({ variables: { id } });
-    window.location.reload();
+    refetch();
   }
 
   const updateHandler = (id: string) => {
     updateTodo({ variables: { id } });
-    window.location.reload();
+    refetch();
   }
 
   return (
@@ -63,8 +60,11 @@ const App = () => {
         <input type='text' placeholder="add new todo" ref={node => { todoInput = node as HTMLInputElement; }} />
         <button type="submit">Add Todo</button>
       </form>
+      {loading && <p>loading...</p>}
+      {error && <p>ERROR</p>}
+      {!data && <p>Not found</p>}
       <ul>
-        {data.todos.map((todo: any) =>
+        {data && data.todos.map((todo: any) =>
           <li key={todo.id}>
             <input type="checkbox" name="status" id={todo.id} checked={todo.completed} onChange={() => { updateHandler(todo.id) }} />
             <span className={todo.completed ? "complete" : "open"}>{todo.text}</span>

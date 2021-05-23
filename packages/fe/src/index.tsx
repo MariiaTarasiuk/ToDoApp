@@ -2,11 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
-import { ApolloClient, InMemoryCache } from '@apollo/client';
+import { ApolloClient, InMemoryCache, NormalizedCacheObject } from '@apollo/client';
 import { ApolloProvider } from '@apollo/react-hooks';
 
-const client = new ApolloClient({
-  uri: 'http://localhost:4000/graphql', cache: new InMemoryCache()
+
+export const cache: InMemoryCache = new InMemoryCache({});
+const client: ApolloClient<NormalizedCacheObject> = new ApolloClient({
+  uri: 'http://localhost:4000/graphql', cache
 });
 
 ReactDOM.render(
