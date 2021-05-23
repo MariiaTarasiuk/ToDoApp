@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { gql } from '@apollo/client';
 
 const READ_TODOS = gql`
-  query todos{
-    todos {
+  query todos($completed: Boolean){
+    todos(completed: $completed) {
       id
       text
       completed
@@ -29,9 +29,17 @@ const DELETE_TODO = gql`
   }
 `;
 
-const App = () => {
+enum TodoStatus {
+  open = 0,
+  done = 1,
+  all = '',
+}
 
-  const { data, loading, error, refetch } = useQuery(READ_TODOS);
+const App = () => {
+  const [filter, setFilter] = useState(TodoStatus.all);
+  const getProppetFilterQuery = (f: TodoStatus): Boolean | null => f === TodoStatus.all ? null : !!f;
+
+  const { data, loading, error, refetch } = useQuery(READ_TODOS, { variables: { completed: getProppetFilterQuery(filter) } });
   const [addTodo] = useMutation(CREATE_TODO);
   const [updateTodo] = useMutation(UPDATE_TODO);
   const [delTodo] = useMutation(DELETE_TODO);
@@ -41,6 +49,7 @@ const App = () => {
   const addHandler = (event: HTMLFormElement) => {
     event.preventDefault();
     addTodo({ variables: { text: todoInput.value } });
+    todoInput.value = '';
     refetch();
   }
 
@@ -54,15 +63,27 @@ const App = () => {
     refetch();
   }
 
+  if (loading) { return <p>loading...</p> }
+  if (error) { return <p>ERROR</p> }
+  if (!data) { return <p>Not found</p> }
+
   return (
     <div className="app">
       <form onSubmit={(e) => addHandler(e as any)}>
+        <h2>Create new todo item:</h2>
         <input type='text' placeholder="add new todo" ref={node => { todoInput = node as HTMLInputElement; }} />
         <button type="submit">Add Todo</button>
       </form>
-      {loading && <p>loading...</p>}
-      {error && <p>ERROR</p>}
-      {!data && <p>Not found</p>}
+      <h2>Filter by:</h2>
+      <fieldset>
+        <input type="radio" name="filter" id="byAll" checked={filter === TodoStatus.all} onChange={() => setFilter(TodoStatus.all)} />
+        <label htmlFor="byAll">All</label>
+        <input type="radio" name="filter" id="byFalse" checked={filter === TodoStatus.open} onChange={() => setFilter(TodoStatus.open)} />
+        <label htmlFor="byFalse">Open</label>
+        <input type="radio" name="filter" id="byTrue" checked={filter === TodoStatus.done} onChange={() => setFilter(TodoStatus.done)} />
+        <label htmlFor="byTrue">Done</label>
+      </fieldset>
+      <h2>Todo list:</h2>
       <ul>
         {data && data.todos.map((todo: any) =>
           <li key={todo.id}>
