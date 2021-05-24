@@ -1,6 +1,7 @@
 # ToDoApp
 
-for lounch app:
+## launch app:
+
 in root run `yarn`
 go to `./packages/be` and run `yarn start`
 go to `./packages/fe` and run `yarn start`
