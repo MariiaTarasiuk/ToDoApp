@@ -1,7 +1,12 @@
 import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup } from '@material-ui/core';
 import React from 'react';
 
-const TodoFilterSet = ({ filter, handleFilterChange }: any) => {
+interface TODO_FILTERS_SET_Props {
+  filter: string,
+  handleFilterChange: () => void
+}
+
+const TodoFilterSet = ({ filter, handleFilterChange }: TODO_FILTERS_SET_Props) => {
   return (
     <FormControl component="fieldset">
       <FormLabel component="legend">Filter by</FormLabel>
