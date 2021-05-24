@@ -1,49 +1,11 @@
 import React, { useState } from 'react';
 import './App.css';
 import { useQuery, useMutation } from '@apollo/react-hooks';
-import { gql } from '@apollo/client';
-
-interface TODO {
-  id: string,
-  text: string,
-  completed: boolean
-}
-
-const READ_TODOS = gql`
-  query todos {
-    todos {
-      id
-      text
-      completed
-    }
-  }
-`;
-
-const CREATE_TODO = gql`
-mutation CreateTodo($text: String!){
-  createTodo(text: $text)
-}`
-
-const UPDATE_TODO = gql`
-mutation UpdateTodo($id: String!){
-  updateTodo(id: $id)
-}`
-
-const DELETE_TODO = gql`
-  mutation RemoveTodo($id: String!){ 
-    removeTodo(id: $id)
-  }
-`;
-
-enum TodoStatus {
-  open = 0,
-  done = 1,
-  all = '',
-}
+import { TODO, TodoStatus } from './helpers/todo.model';
+import { CREATE_TODO, DELETE_TODO, READ_TODOS, UPDATE_TODO } from './helpers/todo.mutation';
 
 const App = () => {
   const [filter, setFilter] = useState(TodoStatus.all);
-
   const { data, loading, error, refetch } = useQuery(READ_TODOS);
   const [addTodo] = useMutation(CREATE_TODO);
   const [updateTodo] = useMutation(UPDATE_TODO);
