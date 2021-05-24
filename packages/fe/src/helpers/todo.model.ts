@@ -5,7 +5,7 @@ export interface TODO {
 }
 
 export enum TodoStatus {
-  open = 0,
-  done = 1,
-  all = "",
+  open,
+  done,
+  all,
 }

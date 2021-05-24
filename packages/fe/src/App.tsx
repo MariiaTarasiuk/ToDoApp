@@ -1,66 +1,43 @@
 import React, { useState } from 'react';
 import './App.css';
 import { useQuery, useMutation } from '@apollo/react-hooks';
+import { Container, Typography } from '@material-ui/core';
+import { Skeleton } from '@material-ui/lab';
 import { TODO, TodoStatus } from './helpers/todo.model';
-import { CREATE_TODO, DELETE_TODO, READ_TODOS, UPDATE_TODO } from './helpers/todo.mutation';
+import { DELETE_TODO, READ_TODOS, UPDATE_TODO } from './helpers/todo.mutation';
+import AddTodoForm from './components/AddTodoForm';
+import TodoFilterSet from './components/TodoFilterSet';
+import TodoList from './components/TodoList';
 
 const App = () => {
-  const [filter, setFilter] = useState(TodoStatus.all);
+  const [filter, setFilter] = useState('all');
+
   const { data, loading, error, refetch } = useQuery(READ_TODOS);
-  const [addTodo] = useMutation(CREATE_TODO);
   const [updateTodo] = useMutation(UPDATE_TODO);
   const [delTodo] = useMutation(DELETE_TODO);
-  let todoInput: HTMLInputElement;
-
-
-  const addHandler = (event: HTMLFormElement) => {
-    event.preventDefault();
-    addTodo({ variables: { text: todoInput.value }, refetchQueries: [{ query: READ_TODOS }] });
-    todoInput.value = '';
-    refetch();
-  }
 
   const removeHandler = (id: string) => {
     delTodo({ variables: { id }, refetchQueries: [{ query: READ_TODOS }] });
-    refetch();
   }
-
   const updateHandler = (id: string) => {
     updateTodo({ variables: { id }, refetchQueries: [{ query: READ_TODOS }] });
-    refetch();
   }
+  const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFilter((event.target as HTMLInputElement).value);
+  };
 
-  if (loading) { return <p>loading...</p> }
-  if (error) { return <p>ERROR</p> }
-  if (!data) { return <p>Not found</p> }
+  if (loading) { return <Skeleton /> }
+  if (error) { return <Typography variant="h2">ERROR</Typography> }
+  if (!data) { return <Typography variant="h2">Not found</Typography> }
+  const todoItems = data ? data.todos.filter((td: TODO) => TodoStatus[filter] === 2 ? td : td.completed === !!TodoStatus[filter]) : [];
 
   return (
-    <div className="app">
-      <form onSubmit={(e) => addHandler(e as any)}>
-        <h2>Create new todo item:</h2>
-        <input type='text' placeholder="add new todo" ref={node => { todoInput = node as HTMLInputElement; }} />
-        <button type="submit">Add Todo</button>
-      </form>
-      <h2>Filter by:</h2>
-      <fieldset>
-        <input type="radio" name="filter" id="byAll" checked={filter === TodoStatus.all} onChange={() => setFilter(TodoStatus.all)} />
-        <label htmlFor="byAll">All</label>
-        <input type="radio" name="filter" id="byFalse" checked={filter === TodoStatus.open} onChange={() => setFilter(TodoStatus.open)} />
-        <label htmlFor="byFalse">Open</label>
-        <input type="radio" name="filter" id="byTrue" checked={filter === TodoStatus.done} onChange={() => setFilter(TodoStatus.done)} />
-        <label htmlFor="byTrue">Done</label>
-      </fieldset>
-      <h2>Todo list:</h2>
-      <ul>
-        {data && data.todos.filter((td: TODO) => filter === TodoStatus.all ? td : td.completed === !!filter).map((todo: any) =>
-          <li key={todo.id}>
-            <input type="checkbox" name="status" id={todo.id} checked={todo.completed} onChange={() => { updateHandler(todo.id) }} />
-            <span className={todo.completed ? "complete" : "open"}>{todo.text}</span>
-            <button onClick={() => removeHandler(todo.id)}>X</button>
-          </li>
-        )}
-      </ul>
-    </div >
+    <Container className="app">
+      <Typography variant="h2">Todo App</Typography>
+      <AddTodoForm />
+      <TodoFilterSet filter={filter} handleFilterChange={handleFilterChange} />
+      <TodoList items={todoItems} updateHandler={updateHandler} removeHandler={removeHandler} />
+    </Container >
   );
 }
 
