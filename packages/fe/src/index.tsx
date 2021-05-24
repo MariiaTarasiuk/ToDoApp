@@ -8,7 +8,7 @@ import { ApolloProvider } from '@apollo/react-hooks';
 
 export const cache: InMemoryCache = new InMemoryCache({});
 const client: ApolloClient<NormalizedCacheObject> = new ApolloClient({
-  uri: 'http://localhost:4000/graphql', cache
+  uri: 'http://localhost:4000/graphql', cache, connectToDevTools: true,
 });
 
 ReactDOM.render(

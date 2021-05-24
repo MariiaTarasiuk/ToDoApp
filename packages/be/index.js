@@ -11,7 +11,7 @@ const typeDefs = gql`
     completed: Boolean
   }
   type Query {
-    todos(completed: Boolean): [Todo]!
+    todos: [Todo]!
   }
   type Mutation {
     createTodo(text: String!): String
@@ -22,8 +22,7 @@ const typeDefs = gql`
 
 const resolvers = {
   Query: {
-    todos: (_parent, args, _context, _info) =>
-      args.completed === null ? todos : todos.filter((td) => td.completed === args.completed),
+    todos: () => todos,
   },
   Mutation: {
     createTodo: (_parent, args, _context, _info) => {

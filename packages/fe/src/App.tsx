@@ -3,9 +3,15 @@ import './App.css';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { gql } from '@apollo/client';
 
+interface TODO {
+  id: string,
+  text: string,
+  completed: boolean
+}
+
 const READ_TODOS = gql`
-  query todos($completed: Boolean){
-    todos(completed: $completed) {
+  query todos {
+    todos {
       id
       text
       completed
@@ -37,9 +43,8 @@ enum TodoStatus {
 
 const App = () => {
   const [filter, setFilter] = useState(TodoStatus.all);
-  const getProppetFilterQuery = (f: TodoStatus): Boolean | null => f === TodoStatus.all ? null : !!f;
 
-  const { data, loading, error, refetch } = useQuery(READ_TODOS, { variables: { completed: getProppetFilterQuery(filter) } });
+  const { data, loading, error, refetch } = useQuery(READ_TODOS);
   const [addTodo] = useMutation(CREATE_TODO);
   const [updateTodo] = useMutation(UPDATE_TODO);
   const [delTodo] = useMutation(DELETE_TODO);
@@ -48,18 +53,18 @@ const App = () => {
 
   const addHandler = (event: HTMLFormElement) => {
     event.preventDefault();
-    addTodo({ variables: { text: todoInput.value } });
+    addTodo({ variables: { text: todoInput.value }, refetchQueries: [{ query: READ_TODOS }] });
     todoInput.value = '';
     refetch();
   }
 
   const removeHandler = (id: string) => {
-    delTodo({ variables: { id } });
+    delTodo({ variables: { id }, refetchQueries: [{ query: READ_TODOS }] });
     refetch();
   }
 
   const updateHandler = (id: string) => {
-    updateTodo({ variables: { id } });
+    updateTodo({ variables: { id }, refetchQueries: [{ query: READ_TODOS }] });
     refetch();
   }
 
@@ -85,7 +90,7 @@ const App = () => {
       </fieldset>
       <h2>Todo list:</h2>
       <ul>
-        {data && data.todos.map((todo: any) =>
+        {data && data.todos.filter((td: TODO) => filter === TodoStatus.all ? td : td.completed === !!filter).map((todo: any) =>
           <li key={todo.id}>
             <input type="checkbox" name="status" id={todo.id} checked={todo.completed} onChange={() => { updateHandler(todo.id) }} />
             <span className={todo.completed ? "complete" : "open"}>{todo.text}</span>
