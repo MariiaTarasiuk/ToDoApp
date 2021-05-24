@@ -12,7 +12,7 @@ import TodoList from './components/TodoList';
 const App = () => {
   const [filter, setFilter] = useState('all');
 
-  const { data, loading, error, refetch } = useQuery(READ_TODOS);
+  const { data, loading, error } = useQuery(READ_TODOS);
   const [updateTodo] = useMutation(UPDATE_TODO);
   const [delTodo] = useMutation(DELETE_TODO);
 
