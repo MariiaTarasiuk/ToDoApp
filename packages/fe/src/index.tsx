@@ -6,7 +6,19 @@ import { ApolloClient, InMemoryCache, NormalizedCacheObject } from '@apollo/clie
 import { ApolloProvider } from '@apollo/react-hooks';
 
 
-export const cache: InMemoryCache = new InMemoryCache({});
+export const cache: InMemoryCache = new InMemoryCache({
+  typePolicies: {
+    Query: {
+      fields: {
+        completed: {
+          merge(existing = [], incoming: any) {
+            return { ...existing, ...incoming };
+          }
+        }
+      }
+    }
+  }
+});
 const client: ApolloClient<NormalizedCacheObject> = new ApolloClient({
   uri: 'http://localhost:4000/graphql', cache, connectToDevTools: true,
 });
