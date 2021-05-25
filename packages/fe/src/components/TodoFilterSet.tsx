@@ -3,7 +3,7 @@ import React from 'react';
 
 interface TODO_FILTERS_SET_Props {
   filter: string,
-  handleFilterChange: () => void
+  handleFilterChange: (event: React.ChangeEvent<HTMLInputElement>) => void
 }
 
 const TodoFilterSet = ({ filter, handleFilterChange }: TODO_FILTERS_SET_Props) => {
